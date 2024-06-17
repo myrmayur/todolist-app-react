@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the code from the GitHub repository
-                git url: 'https://github.com/myrmayur/todolist-app-react.git', branch: 'master'
+                git url: 'https://github.com/myrmayur/todolist-app-react.git', branch: 'main'
             }
         }
         
@@ -38,8 +38,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 // Deploy the built application
-                // Here, we simply copy the build files to a target directory. Adapt this step to your deployment method.
-                sh 'cp -r build/* /path/to/deploy/directory'
+                // This is a placeholder. Update this step to match your deployment strategy.
+                sh 'echo "Deploying the application..."'
             }
         }
     }
