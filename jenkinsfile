@@ -1,0 +1,57 @@
+pipeline {
+    agent any
+
+    environment {
+        NODEJS_HOME = tool name: 'NodeJS 14', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+        PATH = "${NODEJS_HOME}/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from the GitHub repository
+                git url: 'https://github.com/yourusername/your-repo.git', branch: 'main'
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                // Install dependencies
+                sh 'npm install'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Build the ReactJS application
+                sh 'npm run build'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Run tests
+                sh 'npm test'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Deploy the built application
+                // Here, we simply copy the build files to a target directory. Adapt this step to your deployment method.
+                sh 'cp -r build/* /path/to/deploy/directory'
+            }
+        }
+    }
+
+    post {
+        success {
+            // Notify success
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            // Notify failure
+            echo 'Pipeline failed!'
+        }
+    }
+}
