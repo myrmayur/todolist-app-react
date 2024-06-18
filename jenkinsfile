@@ -4,6 +4,7 @@ pipeline {
     environment {
         NODEJS_HOME = tool name: 'NodeJs', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
         PATH = "${NODEJS_HOME}/bin:${env.PATH}"
+        NODE_OPTIONS = '--openssl-legacy-provider'
     }
 
     stages {
@@ -21,6 +22,12 @@ pipeline {
             }
         }
 
+         stage('audit') {
+            steps {
+                // Run tests
+                sh 'npm audit fix --force'
+            }
+        }
         stage('Build') {
             steps {
                 // Build the ReactJS application
@@ -33,6 +40,7 @@ pipeline {
                 // Run tests
                 sh 'npm test'
             }
+        
         }
 
         stage('Deploy') {
