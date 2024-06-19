@@ -9,7 +9,7 @@ pipeline {
 
     tools {
         // Specify the Docker installation name configured in Jenkins
-        dockerTool 'Docker'
+        
         nodejs 'NodeJs' // Ensure this matches the NodeJS installation name in Jenkins
     }
 
