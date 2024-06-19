@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = 'docker-credentials-id'
+        DOCKER_CREDENTIALS_ID = 'DockerID'
         DOCKER_IMAGE = 'myrmayur/react-app'
         KUBECONFIG_CREDENTIALS_ID = 'kubeconfig'
     }
 
     tools {
         // Specify the Docker installation name configured in Jenkins
-        
+        dockerTool 'Docker'
         nodejs 'NodeJs' // Ensure this matches the NodeJS installation name in Jenkins
     }
 
