@@ -3,8 +3,14 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'docker-credentials-id'
-        DOCKER_IMAGE = 'myrmayur/react-app' // Adjust to your Docker Hub repository name
+        DOCKER_IMAGE = 'myrmayur/react-app'
         KUBECONFIG_CREDENTIALS_ID = 'kubeconfig'
+    }
+
+    tools {
+        // Specify the Docker installation name configured in Jenkins
+        dockerTool 'Docker'
+        nodejs 'NodeJs' // Ensure this matches the NodeJS installation name in Jenkins
     }
 
     stages {
@@ -14,7 +20,19 @@ pipeline {
             }
         }
 
-        stage('Build and Push Docker Image') {
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
+        stage('Build Docker Image') {
             steps {
                 script {
                     docker.withRegistry('', DOCKER_CREDENTIALS_ID) {
