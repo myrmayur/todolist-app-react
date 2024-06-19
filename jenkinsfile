@@ -5,7 +5,6 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'docker-credentials-id'
         DOCKER_IMAGE = 'myrmayur/react-app'
         KUBECONFIG_CREDENTIALS_ID = 'kubeconfig'
-        NODE_OPTIONS = '--openssl-legacy-provider'
     }
 
     tools {
