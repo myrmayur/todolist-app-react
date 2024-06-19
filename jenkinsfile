@@ -1,34 +1,26 @@
 pipeline {
-
     agent any
 
     environment {
-        NODE_OPTIONS = '--openssl-legacy-provider'
+        DOCKER_CREDENTIALS_ID = 'docker-credentials-id'
+        DOCKER_IMAGE = 'myrmayur/react-app'
+        KUBECONFIG_CREDENTIALS_ID = 'kubeconfig'
+    }
+
+    tools {
+        nodejs 'NodeJs' // Ensure this matches the NodeJS installation name in Jenkins
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/myrmayur/my-app.git', branch: 'master'
-            }
-        }
-
-        stage('Clean Workspace') {
-            steps {
-                deleteDir() // Clean up the workspace
+                git branch: 'master', url: 'https://github.com/myrmayur/todolist-app-react.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Install dependencies using npm ci
-                sh 'npm i'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh 'npm test'
+                sh 'npm install'
             }
         }
 
@@ -38,72 +30,39 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Build Docker Image') {
             steps {
-                sh 'cp -r build/* /home/ksquarez/todolist-app-react/'
+                script {
+                    docker.withRegistry('', DOCKER_CREDENTIALS_ID) {
+                        def app = docker.build(DOCKER_IMAGE)
+                        app.push('latest')
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: KUBECONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
+                        sh 'kubectl apply -f k8-deployment.yaml'
+                        sh 'kubectl apply -f k8-service.yaml'
+                    }
+                }
             }
         }
     }
 
     post {
+        always {
+            echo 'Cleaning up...'
+            deleteDir()
+        }
         success {
-            script {
-                currentBuild.result = 'SUCCESS'
-            }
+            echo 'Build and deployment completed successfully!'
         }
         failure {
-            script {
-                currentBuild.result = 'FAILURE'
-            }
-        }
-    }
-}
-', branch: 'main'
-            }
-        }
-
-        stage('Clean Workspace') {
-            steps {
-                deleteDir() // Clean up the workspace
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                // Install dependencies using npm ci
-                sh 'npm ci'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh 'npm test'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sh 'cp -r build/* /path/to/deploy/directory'
-            }
-        }
-    }
-
-    post {
-        success {
-            script {
-                currentBuild.result = 'SUCCESS'
-            }
-        }
-        failure {
-            script {
-                currentBuild.result = 'FAILURE'
-            }
+            echo 'Build or deployment failed!'
         }
     }
 }
